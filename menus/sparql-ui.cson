@@ -1,0 +1,30 @@
+# See https://atom.io/docs/latest/hacking-atom-package-word-count#menus for more details
+'context-menu':
+  'atom-text-editor': [
+    {
+      'label': 'Run Sqarql'
+      'command': 'sparql-ui:runQuery'
+    },
+    {
+      'label': 'Set/Show sparql endpoint'
+      'command': 'sparql-ui:configure'
+    }
+  ]
+'menu': [
+  {
+    'label': 'Packages'
+    'submenu': [
+      'label': 'Sparql'
+      'submenu': [
+        {
+          'label': 'Run sparql query'
+          'command': 'sparql-ui:runQuery'
+        },
+        {
+            'label': 'Set/Show endpoint'
+            'command': 'sparql-ui:configure'
+        }
+      ]
+    ]
+  }
+]

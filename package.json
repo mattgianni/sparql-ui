@@ -1,0 +1,25 @@
+{
+  "name": "sparql-ui",
+  "main": "./lib/sparql-ui",
+  "version": "0.1.0",
+  "description": "Query a SPARQL endpoint",
+  "keywords": [
+    "sparql",
+    "query"
+  ],
+  "activationCommands": {
+    "atom-workspace": [
+      "sparql-ui:configure",
+      "sparql-ui:runQuery",
+      "sparql-ui:describeUri"
+    ]
+  },
+  "repository": "https://github.com/mattgianni/sparql-ui",
+  "license": "MIT",
+  "engines": {
+    "atom": ">=1.0.0 <2.0.0"
+  },
+  "dependencies": {
+    "atom-space-pen-views": "^2.2.0"
+  }
+}
