@@ -1,5 +1,6 @@
 {CompositeDisposable} = require 'atom'
 SparqlView = require './sparql-ui-view'
+StatusView = require './sparql-ui-status-view'
 # EndpointView = require './sparql-ui-endpoint'
 url = require 'url'
 
@@ -15,13 +16,14 @@ module.exports = SparqlUi =
             title: 'Show the elapsed time in results report'
 
     sparqlView: null
+    statusView: null
     endpointView: null
     modalPanel: null
     subscriptions: null
     data: null
 
     activate: (state) ->
-        console.debug('sparql-ui:activate(' + JSON.stringify(state) + ')')
+        # console.debug('sparql-ui:activate(' + JSON.stringify(state) + ')')
         if state?.version == 1
             @data = state
         else
@@ -30,6 +32,8 @@ module.exports = SparqlUi =
                 endpoint: 'http://dbpedia.org/sparql'
 
         @sparqlView = new SparqlView(@data)
+        @statusView = new StatusView(@data)
+        @statusView.trackQuery @sparqlView
         # @endpointView = new EndpointView(@data)
 
         # Events subscribed to in atom's system can be easily cleaned up with a CompositeDisposable
@@ -40,17 +44,17 @@ module.exports = SparqlUi =
         @subscriptions.add atom.commands.add 'atom-workspace', 'sparql-ui:runQuery': => @runQuery()
         @subscriptions.add atom.commands.add 'atom-workspace', 'sparql-ui:describeUri': => @describeUri()
 
+    consumeStatusBar: (statusBar) ->
+        element = @statusView.getElement()
+        @statusBarTile = statusBar.addLeftTile(item: element, priority: 100)
+
     deactivate: ->
-        # console.debug('sparql-ui:deactive()')
+        @statusView.destroy()
 
     serialize: ->
         return @data
 
     configure: ->
-        # pane = atom.workspace.getActivePane()
-        # pane.addItem @endpointView
-        # pane.activateItem @endpointView
-
         note = atom.workspace.notificationManager
         editor = atom.workspace.getActiveTextEditor()
         endpoint = editor.getSelectedText()

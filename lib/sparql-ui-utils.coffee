@@ -12,12 +12,10 @@ class SparqlUiUtils
 
     query: (query, callback, default_graph=null) =>
         pep = url.parse @endpoint
+        @postData = querystring.stringify({ query: query })
 
-        data = { query: query }
-        @postData = querystring.stringify(data)
-
-        console.debug 'querying this endpoing: ' + JSON.stringify(pep)
-        console.debug @postData
+        # console.debug 'querying this endpoing: ' + JSON.stringify(pep)
+        # console.debug @postData
 
         options =
             hostname: pep.hostname ? 'dbpedia.org'
@@ -25,14 +23,14 @@ class SparqlUiUtils
             path: pep.path ? '/sparql'
             method: 'POST'
             headers:
-                'Content-type': 'application/x-www-form-urlencoded' # 'application/sparql-query'
-                Accept: 'application/sparql-results+json,application/n-triples'
+                'Content-type': 'application/x-www-form-urlencoded'
+                #Accept: 'application/sparql-results+json,application/n-triples,application/json,text/plain,text/turtle'
+                Accept: 'application/sparql-results+json, application/n-triples, application/json'
                 'Content-length': @postData.length # query.length
 
-        console.debug options
         req = http.request options, (res) =>
-            console.debug "STATUS: #{res.statusCode}"
-            console.debug "HEADERS: #{JSON.stringify res.headers}"
+            # console.debug "STATUS: #{res.statusCode}"
+            # console.debug "HEADERS: #{JSON.stringify res.headers}"
 
             res.setEncoding 'utf8'
             res.on 'data', (chunk) => @resultBuffer += chunk
@@ -43,7 +41,7 @@ class SparqlUiUtils
         req.on 'error', (error) =>
             console.error error.message
             message = """Endpoint: #{@endpoint}
-                Message: #{error.message}"""
+                      Message: #{error.message}"""
             atom.workspace.notificationManager.addError 'Connection failed', detail: message
 
         req.write @postData # query

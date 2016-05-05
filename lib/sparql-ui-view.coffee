@@ -1,4 +1,5 @@
 SparqlUtils = require './sparql-ui-utils'
+{ Emitter } = require 'atom'
 
 module.exports =
 class SparqlUiView
@@ -6,6 +7,7 @@ class SparqlUiView
     constructor: (serializedState) ->
         @props = serializedState
         @cachefn = "/tmp/query_results"
+        @emitter = new Emitter()
 
     # Returns an object that can be retrieved when package is activated
     serialize: ->
@@ -15,7 +17,7 @@ class SparqlUiView
     destroy: ->
 
     parseSparqlJson: (results) ->
-        
+
         if results.length is 0
             return "<empty resultset>\n\n"
 
@@ -25,12 +27,15 @@ class SparqlUiView
         if bindings.length is 0
             return "<empty resultset>\n\n"
 
-        # custom padding / trimming strings (TODO: the trimming part ...)
-        pad = (s, n) ->
+        # custom padding / trimming / converting to strings (TODO: the trimming part ...)
+        pad = (value, n) ->
+            s = value.toString()
             return if n <= s.length then ' ' + s + ' |' else ' ' + s + Array(n - s.length).join(' ') + ' |'
 
         # determine the column widths
-        m = bindings.map( (binding) -> vars.map( (column) -> binding[column].value.length))
+        m = bindings.map( (binding) -> vars.map( (column) ->
+            binding[column].value.toString().length))
+
         vmax = m.reduce (v1, v2) -> v1.map( (n, i) -> Math.max(n, v2[i]))
 
         # make a border
@@ -48,15 +53,31 @@ class SparqlUiView
     parseText: (results) ->
         results
 
+    guid: ->
+        s4 = () ->
+            Math.floor((1 + Math.random()) * 0x10000)
+                .toString(16)
+                .substring(1);
+        s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
+
+    onDidQueryStart: (callback) ->
+        @emitter.on 'did-sparql-query-start', callback
+
+    onDidQueryEnd: (callback) ->
+        @emitter.on 'did-sparql-query-end', callback
+
     submitSparql: (query, editor) ->
-        console.debug('submit sparl')
-        # editor.setText('hey there, Im running\n' + query)
         atom.workspace.notificationManager.addInfo 'Executing query', detail: query
+        queryId = @guid()
+
+        @emitter.emit 'did-sparql-query-start', { id: queryId, query: query }
+
         util = new SparqlUtils(@props.endpoint)
 
         @st = (new Date()).getTime()
         util.query query, (query_results, code, contentType) =>
-            console.warn 'Query results are of type: ' + contentType
+            console.debug 'Query results are of type: ' + contentType
+            @emitter.emit 'did-sparql-query-end', { id: queryId, statusCode: code }
 
             if code >= 400
                 editor.setText(@parseText(query_results))
