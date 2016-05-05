@@ -1,7 +1,6 @@
 {CompositeDisposable} = require 'atom'
 SparqlView = require './sparql-ui-view'
 StatusView = require './sparql-ui-status-view'
-# EndpointView = require './sparql-ui-endpoint'
 url = require 'url'
 
 module.exports = SparqlUi =
@@ -17,13 +16,10 @@ module.exports = SparqlUi =
 
     sparqlView: null
     statusView: null
-    endpointView: null
-    modalPanel: null
     subscriptions: null
     data: null
 
     activate: (state) ->
-        # console.debug('sparql-ui:activate(' + JSON.stringify(state) + ')')
         if state?.version == 1
             @data = state
         else
@@ -34,7 +30,6 @@ module.exports = SparqlUi =
         @sparqlView = new SparqlView(@data)
         @statusView = new StatusView(@data)
         @statusView.trackQuery @sparqlView
-        # @endpointView = new EndpointView(@data)
 
         # Events subscribed to in atom's system can be easily cleaned up with a CompositeDisposable
         @subscriptions = new CompositeDisposable
