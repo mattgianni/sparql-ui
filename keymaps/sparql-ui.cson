@@ -10,5 +10,8 @@
 'atom-workspace':
     'ctrl-alt-p': 'sparql-ui:configure'
     'ctrl-alt-o': 'sparql-ui:runQuery'
+    'ctrl-alt-u': 'sparql-ui:runUpdate'
     'alt-cmd-enter': 'sparql-ui:runQuery'
     'ctrl-alt-k': 'sparql-ui:describeUri'
+    'ctrl-alt-l': 'sparql-ui:inUri'
+    'ctrl-alt-;': 'sparql-ui:outUri'

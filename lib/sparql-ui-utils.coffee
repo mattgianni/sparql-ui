@@ -10,9 +10,13 @@ class SparqlUiUtils
         @endpoint = endpoint
         @type = type
 
-    query: (query, callback, default_graph=null) =>
+    query: (query, update, callback, default_graph=null) =>
         pep = url.parse @endpoint
-        @postData = querystring.stringify({ query: query })
+
+        if update
+            @postData = querystring.stringify({ update: query })
+        else
+            @postData = querystring.stringify({ query: query })
 
         # console.debug 'querying this endpoing: ' + JSON.stringify(pep)
         # console.debug @postData
@@ -25,12 +29,15 @@ class SparqlUiUtils
             headers:
                 'Content-type': 'application/x-www-form-urlencoded'
                 #Accept: 'application/sparql-results+json,application/n-triples,application/json,text/plain,text/turtle'
-                Accept: 'application/sparql-results+json, application/n-triples, application/json'
+                # Accept: 'application/sparql-results+json, text/plain, application/n-triples, application/json'
+                Accept: 'application/sparql-results+json, application/n-triples'
+                # Accept: 'application/rdf+xml'
                 'Content-length': @postData.length # query.length
 
         req = http.request options, (res) =>
-            # console.debug "STATUS: #{res.statusCode}"
-            # console.debug "HEADERS: #{JSON.stringify res.headers}"
+            console.debug "STATUS: #{res.statusCode}"
+            console.debug "HEADERS: #{JSON.stringify res.headers}"
+            console.debug res
 
             res.setEncoding 'utf8'
             res.on 'data', (chunk) => @resultBuffer += chunk

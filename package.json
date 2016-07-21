@@ -11,7 +11,10 @@
     "atom-workspace": [
       "sparql-ui:configure",
       "sparql-ui:runQuery",
-      "sparql-ui:describeUri"
+      "sparql-ui:runUpdate",
+      "sparql-ui:describeUri",
+      "sparql-ui:inUri",
+      "sparql-ui:outUri"
     ]
   },
   "repository": "https://github.com/mattgianni/sparql-ui",

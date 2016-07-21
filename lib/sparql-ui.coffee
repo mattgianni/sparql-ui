@@ -37,7 +37,10 @@ module.exports = SparqlUi =
         # Register command that toggles this view
         @subscriptions.add atom.commands.add 'atom-workspace', 'sparql-ui:configure': => @configure()
         @subscriptions.add atom.commands.add 'atom-workspace', 'sparql-ui:runQuery': => @runQuery()
+        @subscriptions.add atom.commands.add 'atom-workspace', 'sparql-ui:runUpdate': => @runUpdate()
         @subscriptions.add atom.commands.add 'atom-workspace', 'sparql-ui:describeUri': => @describeUri()
+        @subscriptions.add atom.commands.add 'atom-workspace', 'sparql-ui:inUri': => @inUri()
+        @subscriptions.add atom.commands.add 'atom-workspace', 'sparql-ui:outUri': => @outUri()
 
     consumeStatusBar: (statusBar) ->
         element = @statusView.getElement()
@@ -71,7 +74,13 @@ module.exports = SparqlUi =
         query = if selectedText.length > 0 then selectedText else editor.getText()
         @sparqlView.runQuery(query)
 
-    describeUri: ->
+    runUpdate: ->
+        editor = atom.workspace.getActiveTextEditor()
+        selectedText = editor.getSelectedText()
+        query = if selectedText.length > 0 then selectedText else editor.getText()
+        @sparqlView.runQuery(query, true)
+
+    grabUri: ->
         termchar = (s) -> s in [' ', '\t', '\n']
 
         ed = atom.workspace.getActiveTextEditor()
@@ -92,6 +101,13 @@ module.exports = SparqlUi =
         uri = line.substring(start, end)
         uri = '<' + uri if !uri.startsWith '<'
         uri = uri + '>' if !uri.endsWith '>'
+        uri
 
-        # console.debug uri
-        @sparqlView.runQuery("describe #{uri}")
+    describeUri: ->
+        @sparqlView.runQuery("describe #{@grabUri()}")
+
+    inUri: ->
+        @sparqlView.runQuery("select * where { ?sub ?obj #{@grabUri()} }")
+
+    outUri: ->
+        @sparqlView.runQuery("select * where { #{@grabUri()} ?pred ?obj }")

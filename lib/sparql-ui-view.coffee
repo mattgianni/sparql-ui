@@ -6,7 +6,7 @@ class SparqlUiView
 
     constructor: (serializedState) ->
         @props = serializedState
-        @cachefn = "/tmp/query_results"
+        @cachefn = "/private/tmp/query_results"
         @emitter = new Emitter()
 
     # Returns an object that can be retrieved when package is activated
@@ -32,9 +32,17 @@ class SparqlUiView
             s = value.toString()
             return if n <= s.length then ' ' + s + ' |' else ' ' + s + Array(n - s.length).join(' ') + ' |'
 
+        console.debug "Hi there"
+        console.info(bindings)
+
         # determine the column widths
         m = bindings.map( (binding) -> vars.map( (column) ->
-            binding[column].value.toString().length))
+            if binding[column]?
+                binding[column].value.toString().length
+            else
+                0
+            )
+        )
 
         vmax = m.reduce (v1, v2) -> v1.map( (n, i) -> Math.max(n, v2[i]))
 
@@ -45,7 +53,9 @@ class SparqlUiView
         header = '|' + (vars.map( (column, i) -> pad(column, vmax[i]+1)).join("") ) + "\n"
 
         data_array = bindings.map( (binding) ->
-            '|' + (vars.map( (column, i) -> pad(binding[column].value, vmax[i]+1)).join("") ))
+            '|' + (vars.map( (column, i) ->
+                if binding[column]? then pad(binding[column].value, vmax[i]+1) else pad("", vmax[i]+1)).join("") ))
+
         data_string = (data_array.reduce (l1, l2) -> l1 + '\n' + l2) + "\n"
 
         border + header + border + data_string + border
@@ -66,7 +76,7 @@ class SparqlUiView
     onDidQueryEnd: (callback) ->
         @emitter.on 'did-sparql-query-end', callback
 
-    submitSparql: (query, editor) ->
+    submitSparql: (query, editor, update) ->
         atom.workspace.notificationManager.addInfo 'Executing query', detail: query
         queryId = @guid()
 
@@ -75,7 +85,7 @@ class SparqlUiView
         util = new SparqlUtils(@props.endpoint)
 
         @st = (new Date()).getTime()
-        util.query query, (query_results, code, contentType) =>
+        util.query query, update, (query_results, code, contentType) =>
             console.debug 'Query results are of type: ' + contentType
             @emitter.emit 'did-sparql-query-end', { id: queryId, statusCode: code }
 
@@ -104,13 +114,15 @@ class SparqlUiView
                 else
                     editor.setText(@parseText(query_results) + elapsedMsg + queryMsg)
 
-
-    runQuery: (query) ->
+    runQuery: (query, update = false) ->
         editors = atom.workspace.getTextEditors()
-        existingEditor = editors.find((e) => (e.getPath() is @cachefn))
+        existingEditor = editors.find((e) =>
+            console.debug e.getPath()
+            e.getPath() is @cachefn
+        )
         if existingEditor?
-            @submitSparql query, existingEditor
+            @submitSparql query, existingEditor, update
         else
             atom.workspace.open(@cachefn).then (editor) =>
                 editor.setGrammar(atom.grammars.grammarForScopeName('source.rq'))
-                @submitSparql query, editor
+                @submitSparql query, editor, update

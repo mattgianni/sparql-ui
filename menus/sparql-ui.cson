@@ -6,6 +6,10 @@
       'command': 'sparql-ui:runQuery'
     },
     {
+      'label': 'Run Sqarql Update'
+      'command': 'sparql-ui:runUpdate'
+    },
+    {
       'label': 'Set/Show sparql endpoint'
       'command': 'sparql-ui:configure'
     }
@@ -19,6 +23,10 @@
         {
           'label': 'Run sparql query'
           'command': 'sparql-ui:runQuery'
+        },
+        {
+          'label': 'Run sparql update'
+          'command': 'sparql-ui:runUpdate'
         },
         {
             'label': 'Set/Show endpoint'
