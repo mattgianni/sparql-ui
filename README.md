@@ -4,7 +4,7 @@ SPARQL support for [Atom](http://atom.io/).
 
 ## Installation
 
-[sparql-ui](https://github.com/mattgianni/sparql-ui) is not currently a registered package on [Atom.IO Packages](https://atom.io/packages). So the the built-in package installer cannot be used. The files need to be manually installed. The simplest method is to clone the repo into your *packages* folder:
+[sparql-ui](https://github.com/mattgianni/sparql-ui) is not a registered package on [Atom.IO Packages](https://atom.io/packages). This means Atom's built-in package installer cannot be used. The files need to be manually installed. The simplest method is to clone the repo directly into your *packages* folder:
 
 ```[bash]
 pushd ~/.atom/packages
@@ -12,7 +12,7 @@ git clone https://github.com/mattgianni/sparql-ui.git
 popd
 ```
 
-[Atom](https://atom.io/) follows symbolic links when loading packages on startup. If you'd rather clone the repo to a different location, simply create a symbolic link to the alternative location in Atom's packages directory like so:
+[Atom](https://atom.io/) follows symbolic links when loading packages on startup. If you'd rather clone the repo to a different location, simply create a symbolic link in your packages folder to the alternative location:
 
 ```[bash]
 ln -s /path/to/repo ~/.atom/packages/sparql-ui
@@ -22,15 +22,17 @@ After installing the files, the Atom client needs to be restarted. You'll know t
 
 ## Getting Started
 
-Before you can execute a sparql query or update, you'll have to tell [sparql-ui](https://github.com/mattgianni/sparql-ui) which endpoint to use. This can be done by placing your cursor somewhere in the URL for the sparql endpoint and selecting the **[ctrl-alt-p]** command.
+Before you execute a sparql query or update, you'll want to tell [sparql-ui](https://github.com/mattgianni/sparql-ui) which endpoint to use. This can be done by placing your cursor on the URL for the sparql endpoint and selecting the **[ctrl-alt-p]** command.
 
-Try setting you endpoint to DBPedia for example:
+Try setting you endpoint to DBPedia below:
 
 ```
 # http://dbpedia.org/sparql
 ```
 
-Once set, [sparql-ui](https://github.com/mattgianni/sparql-ui) will continue to use this endpoint for future queries until it is reset to a different endpoint. After setting the endpoint to DBPedia, try to following query:
+Once set, [sparql-ui](https://github.com/mattgianni/sparql-ui) will continue to use this endpoint for future queries until it is reset to a different endpoint. Atom should remember the endpoint setting even if the application is restarted.
+
+Once the endpoint is set, try the following query on DBPedia (using the **[ctrl-alt-o]** command):
 
 ```[sparql]
 # endpoint: http://dbpedia.org/sparql
@@ -39,7 +41,7 @@ describe <http://www.wikidata.org/entity/Q10858737>
 
 ## Commands
 
-[sparql-ui](https://github.com/mattgianni/sparql-ui) currently support three operations accessible via kaymaps or the command pallette (**[shft-cmd-P]**). Some of the commands are available through the menu system (under packages and the context menus).
+[sparql-ui](https://github.com/mattgianni/sparql-ui) currently supports the following operations via kaymaps and the command pallette (**[shft-cmd-P]**). Some of the commands are available through the menu system as well (under packages and the context menus).
 
 * **[ctrl-alt-p]** (*Sparql UI:Configure*)
   * sets the endpoint to the currently selected text
